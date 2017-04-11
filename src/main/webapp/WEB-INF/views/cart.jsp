@@ -410,10 +410,12 @@ accompanied by English versions from the 1914 translation by H. Rackham.
     <script src="<c:url value="/resources/assets/js/shop.js"/>"></script>
     <script>
     
+    // method to round line item total //TODO the same in java server side
     function roundAmt(val) {
     	return Math.round((val + 0.00001) * 100) / 100;
     }
     
+    // method to update cart total
     function updateCartTotal() {
     	var total = 0.0;
     	$(".lnItmTotal").each(function(idx, el){
@@ -427,6 +429,7 @@ accompanied by English versions from the 1914 translation by H. Rackham.
     	$("#cartFullTotal").text(Math.round((carttotal + 0.00001) * 100) / 100);
     }
     
+    // common  method to update quantity in session and UI
     function updateSessionAndQuantity(prodId, inpQty, el, lnItmIdx) {
     	var path = '${pageContext.request.contextPath}/update';
     	$.ajax({
