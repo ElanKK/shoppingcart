@@ -6,7 +6,6 @@ package com.mindteck.spring.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
@@ -44,18 +43,21 @@ public class HomeDAO {
 	this.sessionFactory = sessionFactory;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Category> getCategories()
 	{
 		Session objSess = getSessionFactory().getCurrentSession();
-		List<Category> objCatList = objSess.createCriteria(Category.class)
-				.createAlias("objProdList", "prod")
-				.add(Restrictions.ge("prod.dExpiryDate", objDate.getSystemDate()))
-				.add(Restrictions.gt("prod.intQty", 0))
-				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-				.list();
+		List<Category> objCatList = objSess.createCriteria(Category.class).list();
+		/*objSess.createCriteria(Category.class)
+		.createAlias("objProdList", "prod")
+		.add(Restrictions.ge("prod.dExpiryDate", objDate.getSystemDate()))
+		.add(Restrictions.gt("prod.intQty", 0))
+		.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+		.list();*/
 		return objCatList;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Product> getAllProducts()
 	{
 		Session objSess = getSessionFactory().getCurrentSession();
@@ -66,18 +68,33 @@ public class HomeDAO {
 				.list();
 		return objProdList;
 	}
-	public Category getCategory(int intCatId)
+	
+	public Category getByCategory(int intCatId)
 	{
 		Session objSess = getSessionFactory().getCurrentSession();
 		Category objCat = (Category) objSess.get(Category.class, intCatId);
 		return objCat;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Product> getProductsByCategoryId(int intCatId) {
+		Session objSess = getSessionFactory().getCurrentSession();
+		List<Product> objProdList = objSess.createCriteria(Product.class)
+				.createAlias("category", "c")
+				.add(Restrictions.eq("c.intCatgId", intCatId))
+				.add(Restrictions.ge("dExpiryDate", objDate.getSystemDate()))
+				.add(Restrictions.gt("intQty", 0))
+				.list();
+		return objProdList;
+	}
+	
 	public Product getProduct(int intProdID){
 		Session objSess = getSessionFactory().getCurrentSession();
 		Product objProd = (Product)objSess.get(Product.class, intProdID);
 		return objProd;
 		
 	}
+	@SuppressWarnings("unchecked")
 	public List<SearchProduct> searchProducts(String strSearch)
 	{
 		Session objSess = getSessionFactory().getCurrentSession();
@@ -98,6 +115,7 @@ public class HomeDAO {
 		
 		return objSearchList;
 	}
+	@SuppressWarnings("unchecked")
 	public List<Product> getProdSearch(SearchProduct objSearch){
 		
 		Session objSess = getSessionFactory().getCurrentSession();
@@ -109,9 +127,9 @@ public class HomeDAO {
 		
 	}
 	public int cartCheckOut(Order objOrder){
-		
+		int orderid = 0;
 		Session objSess = getSessionFactory().getCurrentSession();
-		int orderid =  (int) objSess.save(objOrder);
+		orderid =  (int) objSess.save(objOrder);
 		return orderid;
 		
 	}
@@ -120,6 +138,7 @@ public class HomeDAO {
 		objSess.saveOrUpdate(objProd);
 		
 	}
+	@SuppressWarnings("unchecked")
 	public List<Order> getHistory(int intUserId){
 		Session objSess = getSessionFactory().getCurrentSession();
 		return objSess.createCriteria(Order.class).add(Restrictions.eq("intUserId", intUserId)).list();

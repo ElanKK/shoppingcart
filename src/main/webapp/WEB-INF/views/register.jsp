@@ -288,7 +288,7 @@ Body Section
 		<label class="control-label">Date of Birth <sup>*</sup></label>
 		<div class="controls">
 		
-		<form:input path="strDOB"  id="datepicker" class="form-control input-md" required="" type="text"></form:input>
+		<form:input path="strDOB"  id="datepicker" class="form-control input-md" required="true" type="text"></form:input>
 		</div>
 		
 		  </div>

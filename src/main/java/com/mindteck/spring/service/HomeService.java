@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mindteck.spring.dao.HomeDAO;
+import com.mindteck.spring.exception.ApplicationException;
 import com.mindteck.spring.model.Category;
 import com.mindteck.spring.model.LineItem;
 import com.mindteck.spring.model.Order;
@@ -42,16 +42,16 @@ public class HomeService {
 	}
 
 	public List<Product> getByCategory(int intCatId) {
-		Category category = objHomeDao.getCategory(intCatId);
-		Hibernate.initialize(category.getObjProdList());
-		List<Product> objProducts = category.getObjProdList();
+		/*Category category = objHomeDao.getByCategory(intCatId);
+		Hibernate.initialize(category.getObjProdList());*/
+		List<Product> objProducts = objHomeDao.getProductsByCategoryId(intCatId);
 		return objProducts;
 	}
 	public Product getProduct(int intProdID){
 		Product objProd = objHomeDao.getProduct(intProdID);
 		return objProd;
 	}
-	public Double getTotalAmount(HashMap objMap){
+	public Double getTotalAmount(HashMap<Integer, ?> objMap){
 		Set<Integer> keys = objMap.keySet();
 		Double dblTotalAmount = 0.0;
         for(Integer key: keys){
@@ -64,7 +64,7 @@ public class HomeService {
 		return Double.valueOf(df.format(dblTotalAmount));
 
 	}
-	public ShoppingCart getCartDetails(HashMap objMap){
+	public ShoppingCart getCartDetails(HashMap<Integer, ?> objMap){
 		ShoppingCart objShopCart = new ShoppingCart();
 		Product objProd;
 		LineItem objLine;
@@ -82,7 +82,7 @@ public class HomeService {
 			objLine.setStrImageName(objProd.getStrImageName());
 			objLine.setStrProdName(objProd.getStrProdName());
 			objLine.setIntInputQty((Integer)objMap.get(key));
-			objLine.setDblTotal(objProd.getDblPrice() * (Integer)objMap.get(key));
+			objLine.setDblTotal(Double.valueOf(df.format(objProd.getDblPrice() * (Integer)objMap.get(key))));
 			dblTotalProducts = dblTotalProducts + objLine.getDblTotal();
 			objShopCart.getObjLineItemList().add(objLine);
 		}
@@ -108,7 +108,7 @@ public class HomeService {
 		objMap.remove(intProdID);
 		return objMap;
 	}
-	public int cartCheckOut(ShoppingCart objCart,int intUserId){
+	public int cartCheckOut(ShoppingCart objCart,int intUserId) throws ApplicationException{
 		Order objOrder = new Order();
 		OrderLineItem objLineItem;
 		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
 
 import com.mindteck.spring.model.User;
-import com.mindteck.spring.model.UserOld;
+
 
 
 /**

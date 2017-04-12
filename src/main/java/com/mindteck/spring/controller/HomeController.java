@@ -1,6 +1,5 @@
 package com.mindteck.spring.controller;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.mindteck.spring.exception.ApplicationException;
 import com.mindteck.spring.model.SearchProduct;
 import com.mindteck.spring.model.ShoppingCart;
 import com.mindteck.spring.model.User;
@@ -34,6 +34,7 @@ public class HomeController {
 		return new HashMap<>();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void cartCount(HttpSession objSession, int intProdId,int intQty) {
 
 		HashMap<Integer, Integer> objCart = (HashMap<Integer, Integer>) objSession.getAttribute("Cart");
@@ -53,7 +54,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/")
-	public String initialPage(Model model,HttpSession objSession) throws IOException {
+	public String initialPage(Model model,HttpSession objSession) throws ApplicationException {
 
 		model.addAttribute("Category", objHomeServ.getCategories());
 		model.addAttribute("Product", objHomeServ.getAllProducts());
@@ -67,7 +68,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/product/{intCatgId}")
-	public String getByCategory(@PathVariable("intCatgId") int intCatId, Model model,HttpSession objSession) throws IOException {
+	public String getByCategory(@PathVariable("intCatgId") int intCatId, Model model,HttpSession objSession) throws ApplicationException {
 
 		model.addAttribute("Category", objHomeServ.getCategories());
 		model.addAttribute("SearchProduct", new SearchProduct());
@@ -85,7 +86,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/productdetails/{intProdID}")
-	public String getProductDetail(@PathVariable("intProdID") int intProdId, Model model,HttpSession objSession) throws IOException {
+	public String getProductDetail(@PathVariable("intProdID") int intProdId, Model model,HttpSession objSession) throws ApplicationException {
 
 		model.addAttribute("Category", objHomeServ.getCategories());
 
@@ -99,7 +100,7 @@ public class HomeController {
 	
 
 	@RequestMapping(value = "/contact")
-	public String ContactPage(Model model,HttpSession objSession) throws IOException {
+	public String ContactPage(Model model,HttpSession objSession) throws ApplicationException {
 		if(objSession.getAttribute("UserName") == null){
 			model.addAttribute("User", new User());
 		}
@@ -108,7 +109,7 @@ public class HomeController {
 
 	@RequestMapping(value = "/AddToCart/{intProdID}")
 	public String AddToCart(@PathVariable("intProdID") int intProdId, Model model, HttpSession objSession)
-			throws IOException {
+			throws ApplicationException {
 		/*if(objSession.getAttribute("UserName") == null){
 			model.addAttribute("User", new User());
 		}
@@ -120,7 +121,7 @@ public class HomeController {
 	}
 	@RequestMapping(value = "/productdetails/AddToCart")
 	public String AddToCartFromDetails(@RequestParam("prodId") int prodId,@RequestParam("inputQty") int inputQty, Model model, HttpSession objSession)
-			throws IOException {
+			throws ApplicationException {
 
 		
 		cartCount(objSession, prodId,inputQty);
@@ -132,8 +133,9 @@ public class HomeController {
 		return "productdetails";
 		
 	}
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/cart")
-	public String showCart(Model model,HttpSession objSession) throws IOException {
+	public String showCart(Model model,HttpSession objSession) throws ApplicationException {
 		ShoppingCart objShopCart = objHomeServ.getCartDetails((HashMap<Integer,Integer>)objSession.getAttribute("Cart"));
 		model.addAttribute("ShoppingCart", objShopCart);
 		if(objSession.getAttribute("UserName") == null){
@@ -142,9 +144,10 @@ public class HomeController {
 			return "cart";
 	}
 
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/delete/{intProdID}")
 	public String deleteFromCart(@ModelAttribute("ShoppingCart") ShoppingCart objCart,
-			@PathVariable("intProdID") int intProdID, Model model, HttpSession objSession) throws IOException {
+			@PathVariable("intProdID") int intProdID, Model model, HttpSession objSession) throws ApplicationException {
 		
 		HashMap<Integer, Integer> objSessionCart = (HashMap<Integer, Integer>)objSession.getAttribute("Cart");
 		objSessionCart = objHomeServ.deleteFromCart(objSessionCart, intProdID);
@@ -159,10 +162,11 @@ public class HomeController {
 		}
 		return "redirect:/cart";
 	}
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/update")
 	@ResponseBody
 	public void update(@RequestParam("prodId") int prodId,@RequestParam("inputQty") int inputQty,HttpSession objSession)
-			throws IOException {		
+			throws ApplicationException {		
 		HashMap<Integer, Integer> objCart = (HashMap<Integer, Integer>) objSession.getAttribute("Cart");
 
 		if (objCart.containsKey(prodId)) {
@@ -177,9 +181,10 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value="/confirmCart", method = RequestMethod.POST)
-	public String cartCheckOut(@ModelAttribute("ShoppingCart") ShoppingCart objCart,Model model, HttpSession objSession){
+	public String cartCheckOut(@ModelAttribute("ShoppingCart") ShoppingCart objCart,Model model, HttpSession objSession) throws ApplicationException{
 		
 		String strReturn = null;
+		/*try{*/
 		if (objSession.getAttribute("UserName") == null) {
 			strReturn = "redirect:/login";
 		}
@@ -192,6 +197,13 @@ public class HomeController {
 			model.addAttribute("Order", orderid);
 			strReturn = "OrderConfirmation";
 		}
+		/*}
+		catch(ApplicationException objExp){
+			
+			model.addAttribute("message", "Something went wrong. Please contact the system admin @ 484 433 2626");
+			strReturn = "index";
+			
+		}*/
 		return strReturn;
 	}
 	
@@ -213,6 +225,11 @@ public class HomeController {
 		model.addAttribute("SearchProduct", objSearch);
 		return "products";
 
+	}
+	@RequestMapping(value = "/product/search", method = RequestMethod.POST)
+	public String getProductSearch(@ModelAttribute("SearchProduct")SearchProduct objSearch,Model model,HttpSession objSession) {
+
+		return getProdSearch(objSearch,model,objSession);
 	}
 	@RequestMapping(value="/OrderHistory")
 	public String getHistory(Model model,HttpSession objSession){

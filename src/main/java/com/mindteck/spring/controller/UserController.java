@@ -1,6 +1,6 @@
 package com.mindteck.spring.controller;
 
-import java.io.IOException;
+
 
 import javax.servlet.http.HttpSession;
 
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.mindteck.spring.exception.ApplicationException;
 import com.mindteck.spring.model.SearchProduct;
 import com.mindteck.spring.model.User;
 import com.mindteck.spring.service.HomeService;
@@ -34,7 +35,7 @@ public class UserController {
 	ProductService objProdService;
 
 	@RequestMapping(value="/register")
-	public String register(HttpSession objSession, Model model) throws IOException{
+	public String register(HttpSession objSession, Model model) throws ApplicationException{
 		
 		if(objSession.getAttribute("UserName") == null){
 			model.addAttribute("User", new User());
@@ -80,24 +81,24 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/login",method = RequestMethod.POST)
-	public String login(@ModelAttribute("User")User objUser,BindingResult result, Model model,HttpSession objSession,RedirectAttributes redir) throws IOException{
+	public String login(@ModelAttribute("User")User objUser,BindingResult result, Model model,HttpSession objSession,RedirectAttributes redir) throws ApplicationException{
 		
 		return aunthenticate(objUser,model,objSession,redir);
 		
 	}
 	@RequestMapping(value = "/productdetails/login")
-	public String productDetailLogin(@ModelAttribute("User")User objUser,Model model,HttpSession objSession,RedirectAttributes redir) throws IOException {
+	public String productDetailLogin(@ModelAttribute("User")User objUser,Model model,HttpSession objSession,RedirectAttributes redir) throws ApplicationException {
 
 		return aunthenticate(objUser,model,objSession,redir);
 	}
 	@RequestMapping(value = "/product/login")
-	public String productLogin(@ModelAttribute("User")User objUser,Model model,HttpSession objSession,RedirectAttributes redir) throws IOException {
+	public String productLogin(@ModelAttribute("User")User objUser,Model model,HttpSession objSession,RedirectAttributes redir) throws ApplicationException {
 
 		return aunthenticate(objUser,model,objSession,redir);
 	}
 	
 	@RequestMapping(value="/Create",method = RequestMethod.POST)
-	public String createUser(@ModelAttribute("User")User objUser,HttpSession objSession,RedirectAttributes redir) throws IOException{
+	public String createUser(@ModelAttribute("User")User objUser,HttpSession objSession,RedirectAttributes redir) throws ApplicationException{
 		
 		
 		String strReturn;
@@ -115,7 +116,7 @@ public class UserController {
 		return strReturn;
 	}
 	@RequestMapping(value="/Account")
-	public String accountDetails(@ModelAttribute("User")User objUser,HttpSession objSession,Model model) throws IOException{
+	public String accountDetails(@ModelAttribute("User")User objUser,HttpSession objSession,Model model) throws ApplicationException{
 		
 		String strReturn;
 		

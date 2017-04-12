@@ -10,10 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mindteck.spring.dao.UserDAO;
+import com.mindteck.spring.exception.ApplicationException;
 import com.mindteck.spring.model.Billing;
 import com.mindteck.spring.model.Payment;
 import com.mindteck.spring.model.User;
-import com.mindteck.spring.model.UserOld;
+
 
 
 /**
@@ -32,7 +33,7 @@ public class UserService {
 	{
 		return objUserdao.auntheticate(objUser);
 	}
-	public void createUser(User objUser)
+	public void createUser(User objUser) throws ApplicationException
 	{
 		 SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy"); 
 			Date parsed;
@@ -41,8 +42,7 @@ public class UserService {
 				parsed = format.parse(objUser.getStrDOB());
 				objUser.setdDOB(parsed);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new ApplicationException(e);
 			}
 			Billing billing = objUser.getObjBilling();
 			billing.setUser(objUser);
@@ -68,7 +68,7 @@ public class UserService {
 			payment.setUser(objUser);
 		objUserdao.updateUser(objUser);
 	}
-	public User getUserDetails(int intUserId)
+	public User getUserDetails(int intUserId) throws ApplicationException
 	{
 		User objUser = null;
 		objUser = objUserdao.getUserDetails(intUserId);
@@ -77,8 +77,7 @@ public class UserService {
 			objUser.setStrDOB(format.format((objUser.getdDOB())));
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ApplicationException(e);
 		}
 		return objUser;
 	}
